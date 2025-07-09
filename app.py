@@ -12,10 +12,14 @@ CORS(app)
 CHARTS_FILE = 'charts.json'
 
 def load_charts():
-    """載入圖表配置"""
+    """載入圖表配置，補上缺漏欄位"""
     if os.path.exists(CHARTS_FILE):
         with open(CHARTS_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            charts = json.load(f)
+            for c in charts:
+                if 'expanded' not in c:
+                    c['expanded'] = False
+            return charts
     return []
 
 def save_charts(charts):
@@ -135,7 +139,7 @@ def add_chart():
     
     return jsonify(new_chart), 201
 
-@app.route("/api/charts/<int:chart_id>", methods=['PUT'])
+@app.route("/api/charts/<int:chart_id>", methods=['PATCH'])
 def update_chart(chart_id):
     """更新圖表設定"""
     data = request.json
@@ -161,6 +165,22 @@ def update_chart(chart_id):
     save_charts(charts)
     
     return jsonify(charts[chart_index])
+
+@app.route("/api/charts-order", methods=['POST'])
+def update_chart_order():
+    new_order = request.json
+    charts = load_charts()
+    chart_dict = {chart["id"]: chart for chart in charts}
+
+    reordered = []
+    for item in new_order:
+        chart = chart_dict.get(item["id"])
+        if chart:
+            chart["expanded"] = item.get("expanded", False)
+            reordered.append(chart)
+
+    save_charts(reordered)
+    return jsonify({"message": "順序已更新"})
 
 @app.route("/api/charts/<int:chart_id>", methods=['DELETE'])
 def delete_chart(chart_id):

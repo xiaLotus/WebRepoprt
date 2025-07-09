@@ -30,7 +30,7 @@
 <body class="min-h-screen p-8 text-blue-600">
   <div id="app" class="max-w-7xl mx-auto space-y-6">
     <h1 class="text-4xl font-bold text-center text-blue-600">
-      Meta BI 儀表板（ECharts）
+      WIP Load Data Chart
     </h1>
 
     <!-- 🎯 篩選列 -->
@@ -94,18 +94,26 @@
       ghost-class="drag-ghost"
       chosen-class="drag-chosen"
       @end="renderAll"
-      class="grid grid-cols-1 md:grid-cols-2 gap-6"
+      class="flex flex-wrap gap-4"
     >
       <template #item="{ element, index }">
-        <div class="bg-white p-4 rounded shadow relative group animate-fade-in min-w-0"
-              data-aos="fade-up">
-          <div class="absolute top-2 right-2 hidden group-hover:flex gap-2">
+    <div
+      :class="[
+          'bg-white p-4 rounded shadow relative group animate-fade-in min-w-0',
+          charts[index].expanded ? 'w-full' : 'w-[calc(50%-0.5rem)]'
+        ]"
+      data-aos="fade-up"
+    >
+          <div class="absolute top-2 right-2 hidden group-hover:flex gap-2 items-center">
+            <button @click="toggleSize(index)" class="text-sm px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
+              {{ charts[index].expanded ? '縮小圖表' : '放大圖表' }}
+            </button>
             <button @click="removeChart(index)">
               <i data-lucide="trash" class="w-5 h-5 text-red-500"></i>
             </button>
           </div>
           <h3 class="text-lg font-bold mb-2 text-blue-600">{{ element.title }}</h3>
-          <div :id="`chart-${index}`" class="w-full h-64"></div>
+          <div :id="`chart-${element.id}`" :class="['w-full', charts[index].expanded ? 'h-[32rem]' : 'h-64']"></div>
         </div>
       </template>
     </draggable>
