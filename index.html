@@ -29,27 +29,80 @@
 
 <body class="min-h-screen p-8 text-blue-600">
   <div id="app" class="max-w-7xl mx-auto space-y-6">
-    <h1 class="text-4xl font-bold text-blue-600 text-center">
-        Meta BI 儀表板（ECharts）
-        </h1>
-    <div class="flex justify-center gap-4">
-      <button @click="addChart" class="px-4 py-2 rounded text-white bg-indigo-600 hover:bg-indigo-700">新增圖表</button>
-      <button @click="clearAll" class="px-4 py-2 rounded text-white bg-red-600 hover:bg-red-700">清除</button>
+    <h1 class="text-4xl font-bold text-center text-blue-600">
+      Meta BI 儀表板（ECharts）
+    </h1>
+
+    <!-- 🎯 篩選列 -->
+    <div
+      class="flex flex-wrap items-end justify-center gap-4 bg-white/60 rounded-lg p-4 shadow">
+      <div>
+        <label class="block text-sm mb-1">棟別</label>
+        <select v-model="filters.building" @change="onFilterChange"
+          class="px-3 py-2 bg-white border rounded">
+          <option value="">全部</option>
+          <option v-for="b in options.buildings" :key="b" :value="b">{{ b }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">樓層</label>
+        <select v-model="filters.floor" @change="onFilterChange"
+          class="px-3 py-2 bg-white border rounded">
+          <option value="">全部</option>
+          <option v-for="f in options.floors" :key="f" :value="f">{{ f }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">站點</label>
+        <select v-model="filters.station" @change="onFilterChange"
+          class="px-3 py-2 bg-white border rounded">
+          <option value="">全部</option>
+          <option v-for="s in options.stations" :key="s" :value="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">儲格</label>
+        <select v-model="filters.storage"
+          class="px-3 py-2 bg-white border rounded">
+          <option disabled value="">← 先選三層</option>
+          <option v-for="c in storageOptions" :key="c" :value="c">{{ c }}</option>
+        </select>
+      </div>
+
+      <button
+        @click="addChart"
+        class="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40"
+        :disabled="!filters.storage">
+        加入圖表
+      </button>
+
+      <button
+        @click="clearAll"
+        class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
+        清除全部
+      </button>
     </div>
 
-        <draggable
-            :list="charts"
-            item-key="id"
-            :animation="200"
-            ghost-class="drag-ghost"
-            chosen-class="drag-chosen"
-            @end="renderAll"
-            class="grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
+    <!-- 🎯 圖表區（保持原本的 draggable） -->
+    <draggable
+      :list="charts"
+      item-key="id"
+      :animation="200"
+      ghost-class="drag-ghost"
+      chosen-class="drag-chosen"
+      @end="renderAll"
+      class="grid grid-cols-1 md:grid-cols-2 gap-6"
+    >
       <template #item="{ element, index }">
-        <div class="bg-white p-4 rounded shadow relative group animate-fade-in" data-aos="fade-up">
+        <div class="bg-white p-4 rounded shadow relative group animate-fade-in min-w-0"
+              data-aos="fade-up">
           <div class="absolute top-2 right-2 hidden group-hover:flex gap-2">
-            <button @click="removeChart(index)"><i data-lucide="trash" class="w-5 h-5 text-red-500"></i></button>
+            <button @click="removeChart(index)">
+              <i data-lucide="trash" class="w-5 h-5 text-red-500"></i>
+            </button>
           </div>
           <h3 class="text-lg font-bold mb-2 text-blue-600">{{ element.title }}</h3>
           <div :id="`chart-${index}`" class="w-full h-64"></div>
@@ -60,4 +113,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>
